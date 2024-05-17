@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (snapshot.exists) {
         setState(() {
-          _wordList = List<String>.from(snapshot['words']);
+          _wordList = List<String>.from(snapshot['official_banned_words_list']);
           _isLoading = false;
         });
       } else {
@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (snapshot.exists) {
         setState(() {
-          _reportedWordList = List<String>.from(snapshot['reported']);
+          _reportedWordList = List<String>.from(snapshot['reported_words_list']);
           _isReportedListLoading = false;
         });
       } else {
@@ -92,11 +92,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  List<String> removeDuplicates(List<String> list) {
+    // Convert the list to a set to remove duplicates
+    Set<String> uniqueSet = list.toSet();
+
+    // Convert the set back to a list
+    List<String> uniqueList = uniqueSet.toList();
+
+    return uniqueList;
+  }
+
   Future<void> saveWordsToFirestoreReportedList(List<String> words) async {
 
     CollectionReference wordsCollection = FirebaseFirestore.instance.collection('tiktok_banned_list');
     await wordsCollection.doc('1OvoCJXkal45ygIJWcc0').set({
-      'reported': words,
+      'reported_words_list': words,
     });
   }
 
@@ -104,24 +114,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
     CollectionReference wordsCollection = FirebaseFirestore.instance.collection('tiktok_banned_list');
     await wordsCollection.doc('cftpk1jkZtLMAikUxXCC').set({
-      'words': words,
+      'official_banned_words_list': words,
     });
   }
 
-  Future<bool> isWordAppearingMoreThanThreeTimesInReportedList(String wordToCheck) async {
+  Future<bool> isWordAppearingANumberOfTimeInReportedList(String wordToCheck, int appearingTime) async {
     try {
       // Replace 'your_collection' with your Firestore collection name
       // and 'your_document' with your document ID
       DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('tiktok_banned_list').doc('1OvoCJXkal45ygIJWcc0').get();
 
       // Assuming your list is stored under a field named 'wordList'
-      List<dynamic> wordList = snapshot.get('reported');
+      List<dynamic> wordList = snapshot.get('reported_words_list');
 
       // Count the occurrences of the wordToCheck in the wordList
       int wordCount = wordList.where((word) => word == wordToCheck).length;
 
       // Check if the word appears more than 3 times
-      return wordCount > 3;
+      return wordCount > appearingTime;
     } catch (e) {
       print('Error: $e');
       return false;
@@ -132,11 +142,12 @@ class _MyHomePageState extends State<MyHomePage> {
     String newWord = _newWordController.text.trim();
     if (newWord.isNotEmpty) {
 
-      bool shouldBeAddToOfficialList = await isWordAppearingMoreThanThreeTimesInReportedList(newWord);
+      bool shouldBeAddToOfficialList = await isWordAppearingANumberOfTimeInReportedList(newWord, 2);
       if (shouldBeAddToOfficialList){
         setState(() {
           _wordList.add(newWord);
         });
+        _wordList = removeDuplicates(_wordList);
         await saveWordsToFirestoreOfficialList(_wordList);
       }
       else {
