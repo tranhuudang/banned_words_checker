@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1036953316945",
+    "project_id": "banned-words-checker",
+    "storage_bucket": "banned-words-checker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036953316945:android:c6e387976f9e2b20885270",
+        "android_client_info": {
+          "package_name": "com.zeroboy.banned_words_checker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSUa092knqtoto9kMx3Low8NrFC7kEQuI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
