@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bool shouldBeAddToOfficialList =
           await isWordAppearingANumberOfTimeInReportedList(newWord, 2);
       if (shouldBeAddToOfficialList) {
-        _wordList = tiktokBlockedWords;
+        _wordList += tiktokBlockedWords;
         setState(() {
           _wordList.add(newWord);
         });
@@ -143,109 +143,140 @@ class _HomeScreenState extends State<HomeScreen> {
     final time = DateTime.now();
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         title: Row(
           children: [
             Image.asset(
               'assets/icon.png',
-              height: 50,
-              width: 50,
+              height: 35,
+              width: 35,
             ),
             8.width,
-             Text('Tiktok Banned Words Checker'.i18n),
+             Text('Banned Words Checker'.i18n),
           ],
         ),
-        actions: [
-          DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: I18n.of(context).locale.languageCode,
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  I18n.of(context).locale = newValue.toLocale();
-                }
-              },
-              items: <String>['en', 'vi'] // Add more languages as needed
-                  .map<DropdownMenuItem<String>>(
-                    (String value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            16.height,
-            Text(
-              'Check if your paragraph contains any banned words from TikTok that could potentially reduce your viewership.'.i18n,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            16.height,
-            if (_wordList.isNotEmpty)
-              Text(
-                '${'Total words in the banned list'.i18n}: ${_wordList.length} (${time.day}-${time.month}-${time.year})',
-              ),
-            16.height,
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else
-              Expanded(
-                child: SingleChildScrollView(
-                  child: TextField(
-                    controller: _controller,
-                    maxLines: null,
-                    decoration:  InputDecoration(
-                      border: const OutlineInputBorder(),
-                      hintText: 'Enter the paragraph you want to check here'.i18n,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text('${'Language'.i18n}: '),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: I18n.of(context).locale.languageCode,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          I18n.of(context).locale = newValue.toLocale();
+                        }
+                      },
+                      items: <String>['en', 'vi'] // Add more languages as needed
+                          .map<DropdownMenuItem<String>>(
+                            (String value) => DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value.i18n),
+                        ),
+                      )
+                          .toList(),
                     ),
                   ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('${'Platform'.i18n}: '),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: 'Tiktok',
+                      onChanged: (String? newValue) {
+
+                      },
+                      items: <String>['Tiktok'] // Add more languages as needed
+                          .map<DropdownMenuItem<String>>(
+                            (String value) => DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        ),
+                      )
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ),
+              16.height,
+              Text(
+                'Check if your paragraph contains any banned words from TikTok that could potentially reduce your viewership.'.i18n,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              16.height,
+              if (_wordList.isNotEmpty)
+                Text(
+                  '${'Total words in the banned list'.i18n}: ${_wordList.length} (${time.day}-${time.month}-${time.year})',
                 ),
+              16.height,
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
+                SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _controller,
+                        maxLines: null,
+                        decoration:  InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: 'Enter the paragraph you want to check here'.i18n,
+                        ),
+                      ),
+                      16.height,
+                      FilledButton(
+                        onPressed: _checkWords,
+                        child:  Text('Check Words'.i18n),
+                      ),
+                    ],
+                  ),
+                ),
+        
+              const SizedBox(height: 16.0),
+              if (_foundWords.isNotEmpty) ...[
+                 Text(
+                  '${'Found words'.i18n}: ',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8.0),
+                Wrap(
+                  spacing: 8.0,
+                  children:
+                      _foundWords.map((word) => Chip(label: Text(word))).toList(),
+                ),
+              ],
+              const Divider(),
+              Text(
+                'Help us improve the app by report new words'.i18n,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-            16.height,
-            FilledButton(
-              onPressed: _checkWords,
-              child:  Text('Check Words'.i18n),
-            ),
-            const SizedBox(height: 16.0),
-            if (_foundWords.isNotEmpty) ...[
-               Text(
-                '${'Found words'.i18n}: ',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              16.height,
+              TextField(
+                controller: _newWordController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: 'Enter a new word to add'.i18n,
+                ),
+                onSubmitted: (String value) {
+                  _addNewWord();
+                },
               ),
-              const SizedBox(height: 8.0),
-              Wrap(
-                spacing: 8.0,
-                children:
-                    _foundWords.map((word) => Chip(label: Text(word))).toList(),
+              16.height,
+              FilledButton(
+                onPressed: _addNewWord,
+                child: Text('Report word'.i18n),
               ),
             ],
-            const Divider(),
-            Text(
-              'Help us improve the app by report new words'.i18n,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            16.height,
-            TextField(
-              controller: _newWordController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText: 'Enter a new word to add'.i18n,
-              ),
-              onSubmitted: (String value) {
-                _addNewWord();
-              },
-            ),
-            16.height,
-            FilledButton(
-              onPressed: _addNewWord,
-              child: Text('Report word'.i18n),
-            ),
-          ],
+          ),
         ),
       ),
     );

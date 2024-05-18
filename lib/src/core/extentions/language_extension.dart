@@ -60,6 +60,22 @@ extension Localization on Object {
       "en_us": "Help us improve the app by report new words",
       "vi_vi": "Giúp chúng tôi cải thiện bằng cách báo cáo những từ mới",
     },
+    "vi": {
+      "en_us": "Tiếng Việt",
+      "vi_vi": "Tiếng Việt",
+    },
+    "en": {
+      "en_us": "English",
+      "vi_vi": "English",
+    },
+    "Language": {
+      "en_us": "Language",
+      "vi_vi": "Ngôn ngữ",
+    },
+    "Platform": {
+      "en_us": "Platform",
+      "vi_vi": "Nền tảng",
+    },
     // "": {
     //   "en_us": "",
     //   "vi_vi": "",
