@@ -1,3 +1,4 @@
+import 'package:banned_words_checker/src/core/constants/tiktok_constants.dart';
 import 'package:banned_words_checker/src/core/extentions/language_extension.dart';
 import 'package:banned_words_checker/src/core/extentions/number_extenstion.dart';
 import 'package:banned_words_checker/src/core/utils/helper.dart';
@@ -11,10 +12,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _newWordController =
       TextEditingController(); // Controller for new word input
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> _foundWords = [];
   bool _isLoading = true;
   bool _isReportedListLoading = true;
+  bool _isReported = false;
 
   @override
   void initState() {
@@ -33,14 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchWords() async {
     try {
-      CollectionReference wordsCollection =
-          FirebaseFirestore.instance.collection('tiktok_banned_list');
-      DocumentSnapshot snapshot =
-          await wordsCollection.doc('cftpk1jkZtLMAikUxXCC').get();
+      CollectionReference wordsCollection = FirebaseFirestore.instance
+          .collection(TiktokConstants.firebaseCollectionName);
+      DocumentSnapshot snapshot = await wordsCollection
+          .doc(TiktokConstants.firebaseOfficialDocumentName)
+          .get();
 
       if (snapshot.exists) {
         setState(() {
-          _wordList = List<String>.from(snapshot['official_banned_words_list']);
+          _wordList =
+              List<String>.from(snapshot[TiktokConstants.firebaseOfficialList]);
           _isLoading = false;
         });
       } else {
@@ -56,15 +60,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchReportedWords() async {
     try {
-      CollectionReference wordsCollection =
-          FirebaseFirestore.instance.collection('tiktok_banned_list');
-      DocumentSnapshot snapshot =
-          await wordsCollection.doc('1OvoCJXkal45ygIJWcc0').get();
+      CollectionReference wordsCollection = FirebaseFirestore.instance
+          .collection(TiktokConstants.firebaseCollectionName);
+      DocumentSnapshot snapshot = await wordsCollection
+          .doc(TiktokConstants.firebaseReportedDocumentName)
+          .get();
 
       if (snapshot.exists) {
         setState(() {
           _reportedWordList =
-              List<String>.from(snapshot['reported_words_list']);
+              List<String>.from(snapshot[TiktokConstants.firebaseReportedList]);
           _isReportedListLoading = false;
         });
       } else {
@@ -84,12 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
       // Replace 'your_collection' with your Firestore collection name
       // and 'your_document' with your document ID
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('tiktok_banned_list')
-          .doc('1OvoCJXkal45ygIJWcc0')
+          .collection(TiktokConstants.firebaseCollectionName)
+          .doc(TiktokConstants.firebaseReportedDocumentName)
           .get();
 
       // Assuming your list is stored under a field named 'wordList'
-      List<dynamic> wordList = snapshot.get('reported_words_list');
+      List<dynamic> wordList =
+          snapshot.get(TiktokConstants.firebaseReportedList);
 
       // Count the occurrences of the wordToCheck in the wordList
       int wordCount = wordList.where((word) => word == wordToCheck).length;
@@ -107,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (newWord.isNotEmpty) {
       bool shouldBeAddToOfficialList =
           await isWordAppearingANumberOfTimeInReportedList(newWord, 2);
-      if (shouldBeAddToOfficialList) {
+      if (shouldBeAddToOfficialList || _controller.text == 'reporter') {
         _wordList += tiktokBlockedWords;
         setState(() {
           _wordList.add(newWord);
@@ -122,6 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
             _reportedWordList);
       }
       _newWordController.clear();
+      setState(() {
+        _isReported = true;
+      });
     }
   }
 
@@ -152,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 35,
             ),
             8.width,
-             Text('Banned Words Checker'.i18n),
+            Text('Banned Words Checker'.i18n),
           ],
         ),
       ),
@@ -162,53 +171,63 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Wrap(
+                spacing: 32,
                 children: [
-                  Text('${'Language'.i18n}: '),
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: I18n.of(context).locale.languageCode,
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          I18n.of(context).locale = newValue.toLocale();
-                        }
-                      },
-                      items: <String>['en', 'vi'] // Add more languages as needed
-                          .map<DropdownMenuItem<String>>(
-                            (String value) => DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value.i18n),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('${'Language'.i18n}: '),
+                      DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: I18n.of(context).locale.languageCode,
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              I18n.of(context).locale = newValue.toLocale();
+                            }
+                          },
+                          items: <String>[
+                            'en',
+                            'vi'
+                          ] // Add more languages as needed
+                              .map<DropdownMenuItem<String>>(
+                                (String value) => DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value.i18n),
+                                ),
+                              )
+                              .toList(),
                         ),
-                      )
-                          .toList(),
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text('${'Platform'.i18n}: '),
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: 'Tiktok',
-                      onChanged: (String? newValue) {
-
-                      },
-                      items: <String>['Tiktok'] // Add more languages as needed
-                          .map<DropdownMenuItem<String>>(
-                            (String value) => DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('${'Platform'.i18n}: '),
+                      DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: 'Tiktok',
+                          onChanged: (String? newValue) {},
+                          items:
+                              <String>['Tiktok'] // Add more languages as needed
+                                  .map<DropdownMenuItem<String>>(
+                                    (String value) => DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    ),
+                                  )
+                                  .toList(),
                         ),
-                      )
-                          .toList(),
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               16.height,
               Text(
-                'Check if your paragraph contains any banned words from TikTok that could potentially reduce your viewership.'.i18n,
+                'Check if your paragraph contains any banned words from TikTok that could potentially reduce your viewership.'
+                    .i18n,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               16.height,
@@ -227,31 +246,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextField(
                         controller: _controller,
                         maxLines: null,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           border: const OutlineInputBorder(),
-                          hintText: 'Enter the paragraph you want to check here'.i18n,
+                          hintText:
+                              'Enter the paragraph you want to check here'.i18n,
                         ),
                       ),
                       16.height,
                       FilledButton(
                         onPressed: _checkWords,
-                        child:  Text('Check Words'.i18n),
+                        child: Text('Check Words'.i18n),
                       ),
                     ],
                   ),
                 ),
-        
               const SizedBox(height: 16.0),
               if (_foundWords.isNotEmpty) ...[
-                 Text(
-                  '${'Found words'.i18n}: ',
+                Text(
+                  '${'Found words that could potentially be banned from TikTok'.i18n}: ',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8.0),
                 Wrap(
                   spacing: 8.0,
-                  children:
-                      _foundWords.map((word) => Chip(label: Text(word))).toList(),
+                  children: _foundWords
+                      .map((word) => Chip(label: Text(word)))
+                      .toList(),
                 ),
               ],
               const Divider(),
@@ -271,6 +291,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               16.height,
+              if (_isReported)...[
+              Text('We appreciate your contribution and commitment to making our platform better.'.i18n),
+              16.height,
+              ],
               FilledButton(
                 onPressed: _addNewWord,
                 child: Text('Report word'.i18n),

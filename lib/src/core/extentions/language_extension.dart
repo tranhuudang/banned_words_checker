@@ -44,9 +44,9 @@ extension Localization on Object {
       "vi_vi": "Kiểm tra từ ngữ",
     },
 
-    "Found words": {
-      "en_us": "Found words",
-      "vi_vi": "Từ được tìm thấy",
+    "Found words that could potentially be banned from TikTok": {
+      "en_us": "Found words that could potentially be banned from TikTok",
+      "vi_vi": "Đã tìm thấy những từ có thể bị cấm trên TikTok",
     },
     "Report word": {
       "en_us": "Report word",
@@ -76,10 +76,15 @@ extension Localization on Object {
       "en_us": "Platform",
       "vi_vi": "Nền tảng",
     },
+    "We appreciate your contribution and commitment to making our platform better.": {
+      "en_us": "We appreciate your contribution and commitment to making our platform better.",
+      "vi_vi": "Chúng tôi trân trọng sự đóng góp và cam kết của bạn trong việc làm cho nền tảng của chúng ta trở nên tốt hơn.",
+    },
     // "": {
     //   "en_us": "",
     //   "vi_vi": "",
     // },
+
   });
 
   String get i18n => localize(this, _t);
