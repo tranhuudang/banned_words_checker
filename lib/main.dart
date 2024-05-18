@@ -1,3 +1,4 @@
+import 'package:banned_words_checker/tiktik_blocked_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -144,6 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       bool shouldBeAddToOfficialList = await isWordAppearingANumberOfTimeInReportedList(newWord, 2);
       if (shouldBeAddToOfficialList){
+      _wordList = tiktokBlockedWords;
         setState(() {
           _wordList.add(newWord);
         });
@@ -235,6 +237,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 border: OutlineInputBorder(),
                 hintText: 'Enter a new word to add',
               ),
+              onSubmitted: (String value){
+                _addNewWord();
+              },
             ),
             SizedBox(height: 16.0),
             FilledButton(
