@@ -1,6 +1,9 @@
+import 'package:banned_words_checker/src/core/extention/language_extension.dart';
 import 'package:banned_words_checker/tiktik_blocked_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -17,13 +20,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Banned Words Checker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return I18n(
+      child: MaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', "US"),
+          Locale('vi', "VI"),
+        ],
+        debugShowCheckedModeBanner: false,
+        title: 'Banned Words Checker',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -180,7 +194,33 @@ class _MyHomePageState extends State<MyHomePage> {
     final time = DateTime.now();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tiktok Banned Words Checker'),
+        title: Row(
+          children: [
+            Image.asset('assets/icon.png', height: 50, width: 50,),
+            SizedBox(width: 16,),
+            const Text('Tiktok Banned Words Checker'),
+          ],
+        ),
+        actions: [
+           DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: I18n.of(context).locale.languageCode,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    I18n.of(context).locale = newValue.toLocale();
+                  }
+                },
+                items: <String>['en', 'vi'] // Add more languages as needed
+                    .map<DropdownMenuItem<String>>(
+                      (String value) => DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  ),
+                )
+                    .toList(),
+              ),
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
