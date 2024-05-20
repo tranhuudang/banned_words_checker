@@ -6,7 +6,10 @@ import 'package:banned_words_checker/src/data/firebase_data/firebase_data_handle
 import 'package:banned_words_checker/src/data/local_data/tiktik_blocked_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:wave_divider/wave_divider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -299,10 +302,164 @@ class HomeScreenState extends State<HomeScreen> {
                 onPressed: _addNewWord,
                 child: Text('Report word'.i18n),
               ),
+              16.height,
+              WaveDivider(),
+              16.height,
+              // Center(
+              //   child: Text(
+              //     '© 2024 Tran Huu Dang. All rights reserved.',
+              //     style: TextStyle(
+              //       fontSize: 14.0,
+              //       color: Colors.black,
+              //     ),
+              //   ),
+              // ),
+              Footer(),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class Footer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Contact',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Row(
+                    children: [
+                      Icon(Icons.email, color: Colors.black),
+                      SizedBox(width: 5.0),
+                      TextButton(
+                        onPressed: () => _launchURL('mailto:tranhuudang148@gmail.com'),
+                        child: Text(
+                          'tranhuudang148@gmail.com',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.phone, color: Colors.black),
+                      SizedBox(width: 5.0),
+                      TextButton(
+                        onPressed: () => _launchURL('tel:+84843909394'),
+                        child: Text(
+                          '+84843909394',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.link, color: Colors.black),
+                      SizedBox(width: 5.0),
+                      TextButton(
+                        onPressed: () => _launchURL('https://github.com/tranhuudang'),
+                        child: Text(
+                          'GitHub',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.link, color: Colors.black),
+                      SizedBox(width: 5.0),
+                      TextButton(
+                        onPressed: () => _launchURL('https://www.tiktok.com/@gnaduuhnart'),
+                        child: Text(
+                          'TikTok',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              16.height,
+              Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 150,
+                      height: 200,
+                      child: Image.asset(
+                        'assets/TCB-QR-TRAN HUU DANG-20239171135.jpg', // Replace with your QR code image URL
+              fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Text(
+                    'Donate to support the app',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          16.height,
+          WaveDivider(),
+          16.height,
+          Center(
+            child: Text(
+              '© 2024 Tran Huu Dang. All rights reserved.',
+              style: TextStyle(
+                fontSize: 14.0,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
