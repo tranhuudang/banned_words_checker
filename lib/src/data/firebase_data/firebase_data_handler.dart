@@ -1,3 +1,4 @@
+import 'package:banned_words_checker/src/core/constants/tiktok_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseDataHandler{
@@ -14,6 +15,14 @@ class FirebaseDataHandler{
     CollectionReference wordsCollection = FirebaseFirestore.instance.collection('tiktok_banned_list');
     await wordsCollection.doc('1OvoCJXkal45ygIJWcc0').set({
       'reported_words_list': words,
+    });
+  }
+
+  static Future<void> addNewVisitor(int currentValue) async {
+
+    CollectionReference wordsCollection = FirebaseFirestore.instance.collection('tiktok_banned_list');
+    await wordsCollection.doc(TiktokConstants.firebaseStatisticDocumentName).set({
+      TiktokConstants.firebaseVisitorsNumber: currentValue,
     });
   }
 

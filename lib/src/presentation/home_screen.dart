@@ -28,12 +28,15 @@ class HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isReportedListLoading = true;
   bool _isReported = false;
+  int _numberOfVisitor = 0;
+  bool _isNumberOfVisitorLoading = true;
 
   @override
   void initState() {
     super.initState();
     _fetchWords();
     _fetchReportedWords();
+    _fetchNumberOfVisitor();
   }
 
   Future<void> _fetchWords() async {
@@ -60,6 +63,30 @@ class HomeScreenState extends State<HomeScreen> {
       print(e);
     }
   }
+  Future<void> _fetchNumberOfVisitor() async {
+    try {
+      CollectionReference wordsCollection = FirebaseFirestore.instance
+          .collection(TiktokConstants.firebaseCollectionName);
+      DocumentSnapshot snapshot = await wordsCollection
+          .doc(TiktokConstants.firebaseStatisticDocumentName)
+          .get();
+
+      if (snapshot.exists) {
+        setState(() {
+          _numberOfVisitor = snapshot[TiktokConstants.firebaseVisitorsNumber];
+          _isLoading = false;
+        });
+        await FirebaseDataHandler.addNewVisitor(_numberOfVisitor + 1);
+      } else {
+        throw Exception('Document does not exist');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print(e);
+    }
+  }
 
   Future<void> _fetchReportedWords() async {
     try {
@@ -73,14 +100,14 @@ class HomeScreenState extends State<HomeScreen> {
         setState(() {
           _reportedWordList =
               List<String>.from(snapshot[TiktokConstants.firebaseReportedList]);
-          _isReportedListLoading = false;
+          _isNumberOfVisitorLoading = false;
         });
       } else {
         throw Exception('Document does not exist');
       }
     } catch (e) {
       setState(() {
-        _isReportedListLoading = false;
+        _isNumberOfVisitorLoading = false;
       });
       print(e);
     }
@@ -138,10 +165,13 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void _checkWords() {
-    String paragraph = _controller.text.toLowerCase();
+    String paragraph = _controller.text.toLowerCase().trim();
     List<String> foundWords = [];
     for (String word in _wordList) {
-      if (paragraph.contains(word.toLowerCase())) {
+      if (paragraph.contains(' ${word.toLowerCase()} ') ||
+          paragraph.contains(' ${word.toLowerCase()}') ||
+          paragraph.contains('${word.toLowerCase()} ') ||
+          paragraph.contains(word.toLowerCase()) && paragraph.length == word.length ) {
         foundWords.add(word);
       }
     }
@@ -174,6 +204,8 @@ class HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('Visitors: $_numberOfVisitor'),
+              
               Wrap(
                 spacing: 32,
                 children: [
@@ -385,7 +417,7 @@ class Footer extends StatelessWidget {
                       TextButton(
                         onPressed: () => _launchURL('https://github.com/tranhuudang'),
                         child: Text(
-                          'GitHub',
+                          'GitHub: /tranhuudang',
                           style: TextStyle(
                             fontSize: 14.0,
                             color: Colors.black,
@@ -394,48 +426,48 @@ class Footer extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      Icon(Icons.link, color: Colors.black),
-                      SizedBox(width: 5.0),
-                      TextButton(
-                        onPressed: () => _launchURL('https://www.tiktok.com/@gnaduuhnart'),
-                        child: Text(
-                          'TikTok',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     Icon(Icons.link, color: Colors.black),
+                  //     SizedBox(width: 5.0),
+                  //     TextButton(
+                  //       onPressed: () => _launchURL('https://www.tiktok.com/@gnaduuhnart'),
+                  //       child: Text(
+                  //         'TikTok',
+                  //         style: TextStyle(
+                  //           fontSize: 14.0,
+                  //           color: Colors.black,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
-              16.height,
-              Column(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 150,
-                      height: 200,
-                      child: Image.asset(
-                        'assets/TCB-QR-TRAN HUU DANG-20239171135.jpg', // Replace with your QR code image URL
-              fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.0),
-                  Text(
-                    'Donate to support the app',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
+              //
+              // Column(
+              //   children: [
+              //     ClipRRect(
+              //       borderRadius: BorderRadius.circular(10),
+              //       child: Container(
+              //         width: 150,
+              //         height: 200,
+              //         child: Image.asset(
+              //           'assets/TCB-QR-TRAN HUU DANG-20239171135.jpg', // Replace with your QR code image URL
+              // fit: BoxFit.cover,
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(height: 10.0),
+              //     Text(
+              //       'Donate to support the app',
+              //       style: TextStyle(
+              //         fontSize: 14.0,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
           16.height,
