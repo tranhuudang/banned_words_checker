@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 
@@ -51,6 +50,12 @@ extension Localization on Object {
       "en_us": "Report word",
       "vi_vi": "Báo cáo từ",
     },
+
+    "Help us improve the app by reporting new words": {
+      "en_us": "Help us improve the app by reporting new words",
+      "vi_vi":
+          "Giúp chúng tôi cải thiện chất lượng ứng dụng bằng cách báo cáo thêm những từ mới",
+    },
     "Enter a new word to add": {
       "en_us": "Enter a new word to add",
       "vi_vi": "Nhập từ bạn muốn báo cáo",
@@ -75,15 +80,17 @@ extension Localization on Object {
       "en_us": "Platform",
       "vi_vi": "Nền tảng",
     },
-    "We appreciate your contribution and commitment to making our platform better.": {
-      "en_us": "We appreciate your contribution and commitment to making our platform better.",
-      "vi_vi": "Chúng tôi trân trọng sự đóng góp và cam kết của bạn trong việc làm cho nền tảng của chúng ta trở nên tốt hơn.",
+    "We appreciate your contribution and commitment to making our platform better.":
+        {
+      "en_us":
+          "We appreciate your contribution and commitment to making our platform better.",
+      "vi_vi":
+          "Chúng tôi trân trọng sự đóng góp và cam kết của bạn trong việc làm cho nền tảng của chúng ta trở nên tốt hơn.",
     },
     // "": {
     //   "en_us": "",
     //   "vi_vi": "",
     // },
-
   });
 
   String get i18n => localize(this, _t);
