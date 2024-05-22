@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  i18n_extension: ^11.0.12
+  i18n_extension: any
   flutter_localizations:
     sdk: flutter
   flutter_localization: ^0.1.14
@@ -22,6 +22,7 @@ dependencies:
   wave_divider: ^0.0.3
   url_launcher: ^6.2.6
   url_launcher_web: ^2.3.1
+  flutter_riverpod: ^2.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

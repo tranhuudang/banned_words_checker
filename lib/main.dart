@@ -1,7 +1,8 @@
-import 'package:banned_words_checker/src/presentation/home_screen.dart';
+import 'package:banned_words_checker/src/presentation/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'firebase_options.dart';
 
@@ -19,22 +20,24 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return I18n(
-      child: MaterialApp(
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en', "US"),
-          Locale('vi', "VI"),
-        ],
-        debugShowCheckedModeBanner: false,
-        title: 'Banned Words Checker',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', "US"),
+            Locale('vi', "VI"),
+          ],
+          debugShowCheckedModeBanner: false,
+          title: 'Banned Words Checker',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const HomeScreen(),
         ),
-        home: const HomeScreen(),
       ),
     );
   }
